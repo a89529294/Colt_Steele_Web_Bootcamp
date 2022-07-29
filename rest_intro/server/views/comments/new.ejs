@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Create a Comment</title>
+  </head>
+  <body>
+    <h1>Make a new comment</h1>
+    <form action="/comments" method="post">
+      <section>
+        <label>
+          Enter username:
+          <input type="text" name="username" placeholder="username"
+        /></label>
+      </section>
+
+      <section>
+        <label>
+          Comment text:
+          <br />
+          <textarea rows="5" cols="30" name="comment"></textarea>
+        </label>
+      </section>
+      <button>Submit</button>
+    </form>
+    <a href="/comments">Go back to all comments</a>
+  </body>
+</html>
