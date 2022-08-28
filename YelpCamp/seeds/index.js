@@ -1,5 +1,6 @@
 const mongoose = require("mongoose");
 const Campground = require("../models/campground");
+const Review = require("../models/review");
 const cities = require("./cities");
 const { descriptors, places } = require("./seedHelpers");
 
@@ -8,11 +9,12 @@ async function main() {
   await mongoose.connect("mongodb://localhost:27017/yelp-camp");
 }
 mongoose.connection.on("open", () => {
-  console.log("succesfully connected to mongo db");
+  console.log("successfully connected to mongo db");
 });
 
 const seedDb = async () => {
   await Campground.deleteMany();
+  await Review.deleteMany();
   const campsArray = [];
   for (let i = 0; i < 50; i++) {
     const randomCityIndex = Math.floor(Math.random() * cities.length);
