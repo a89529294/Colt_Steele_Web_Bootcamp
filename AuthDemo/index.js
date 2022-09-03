@@ -11,6 +11,11 @@ async function main() {
 }
 main().catch((err) => console.log(err));
 
+function requireLogin(req, res, next) {
+  if (!req.session.user_id) res.redirect("login");
+  else next();
+}
+
 app.set("view engine", "ejs");
 app.set("views", "views");
 app.use(express.urlencoded({ extended: true }));
@@ -32,8 +37,7 @@ app.get("/register", (req, res) => {
 
 app.post("/register", async (req, res) => {
   const { username, password } = req.body;
-  const hashedPw = await bcrypt.hash(password, 12);
-  const user = new User({ username, password: hashedPw });
+  const user = new User({ username, password });
   await user.save();
   req.session.user_id = user._id;
   res.redirect("/secret");
@@ -45,18 +49,18 @@ app.get("/login", (req, res) => {
 
 app.post("/login", async (req, res) => {
   const { username, password } = req.body;
-  const user = await User.findOne({ username });
-
-  const validPw = await bcrypt.compare(password, user.password);
-  if (validPw) {
+  const user = await User.findAndValidate(username, password);
+  if (user) {
     req.session.user_id = user._id;
     res.redirect("/secret");
   } else res.redirect("/login");
 });
 
-app.get("/secret", (req, res) => {
-  if (!req.session.user_id) res.redirect("login");
-  else res.render("secret");
+app.get("/secret", requireLogin, (req, res) => {
+  res.render("secret");
+});
+app.get("/top-secret", requireLogin, (req, res) => {
+  res.send("top secret");
 });
 
 app.post("/logout", (req, res) => {
