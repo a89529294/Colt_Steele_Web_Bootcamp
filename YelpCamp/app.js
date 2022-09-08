@@ -8,6 +8,10 @@ const campgroundRouter = require("./routes/campgrounds");
 const reviewRouter = require("./routes/reviews");
 const session = require("express-session");
 const flash = require("connect-flash");
+const passport = require("passport");
+const LocalStrategy = require("passport-local");
+const User = require("./models/user");
+
 const app = express();
 
 main().catch((err) => console.log(err));
@@ -40,6 +44,12 @@ app.use(
   })
 );
 app.use(flash());
+app.use(passport.initialize());
+app.use(passport.session());
+passport.use(new LocalStrategy(User.authenticate()));
+// how passport stores and retreives user in session object
+passport.serializeUser(User.serializeUser());
+passport.deserializeUser(User.deserializeUser());
 
 app.get("/", (req, res) => {
   res.render("home");
@@ -53,6 +63,12 @@ app.use((req, res, next) => {
 
 app.use("/campgrounds", campgroundRouter);
 app.use("/campgrounds/:id/reviews", reviewRouter);
+
+app.use("/fakeUser", async (req, res) => {
+  const u = new User({ email: "abc@example.com", username: "abc" });
+  const nu = await User.register(u, "chicken");
+  res.send(nu);
+});
 
 app.all("*", (req, res, next) => {
   next(new ExpressError("Page Not Found", 404));
